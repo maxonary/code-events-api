@@ -11,3 +11,5 @@ google-api-python-client
 slack-sdk
 openai
 python-dotenv
+pytest
+httpx
