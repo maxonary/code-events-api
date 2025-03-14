@@ -74,6 +74,7 @@ This project is a FastAPI-based application for organizing and managing events o
 1. Fork the repo and create a new branch.
 2. Make your changes and commit them.
 3. Submit a pull request!
+Contanct Maximilian Arnold for support questions around the setup or database key acess at [email](mailto:maximilian.arnold@code.berlin)
 
 ## License
 This project is licensed under the Apache 2.0 License.
