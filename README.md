@@ -8,6 +8,7 @@ This project is a FastAPI-based application for organizing and managing events o
 - **Visibility Options**: Events can be public, private, or university-only
 - **MongoDB Storage**: Events are stored in MongoDB for efficient querying
 - **Modular Integrations**:
+  - **Jira**: Source events from Tickets
   - **Google Calendar**: Sync events
   - **Slack Notifications**: Notify a Slack channel about new events
   - **Luma Events**: Manage RSVPs
@@ -16,8 +17,9 @@ This project is a FastAPI-based application for organizing and managing events o
 ## Tech Stack
 - **FastAPI**: API framework
 - **MongoDB**: Database (using Motor for async operations)
+- **Jira API**: Event sourcing
 - **Google Calendar API**: Event synchronization
-- **Slack API**: Notifications
+- **Slack API**: Event sourcing via LLM
 - **Luma Events API**: Event management
 - **OpenAI API**: Event description processing
 
@@ -36,12 +38,17 @@ This project is a FastAPI-based application for organizing and managing events o
    ```sh
    pip install -r requirements.txt
    ```
-4. **Start MongoDB**
+4. **Fill out the .env file**
+   Copy the .env.example file to .env
+   ```sh
+   cp .env.example .env
+   ```
+5. **Start MongoDB**
    Ensure you have MongoDB installed and running:
    ```sh
    mongod --dbpath /path/to/your/db
    ```
-5. **Run the FastAPI Server**
+6. **Run the FastAPI Server**
    ```sh
    uvicorn main:app --reload
    ```
@@ -65,8 +72,9 @@ This project is a FastAPI-based application for organizing and managing events o
   - `visibility` (`public`, `private`, `university-only`)
 
 ## Upcoming Integrations
+- [x] Jira Event Sourcing
 - [ ] Google Calendar Sync
-- [ ] Slack Notifications
+- [ ] Slack Event Sourcing
 - [ ] LumaEvents API Integration
 - [ ] LLM-powered Description Processing
 
