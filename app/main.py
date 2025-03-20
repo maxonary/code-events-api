@@ -1,12 +1,12 @@
 from fastapi import FastAPI
-from app.routes.events import router as event_router
-from app.routes.calendar import router as calendar_router
+from app.routes import events, calendar, jira
 
 app = FastAPI()
 
 # Include routes
-app.include_router(event_router, prefix="/events", tags=["Events"])
-app.include_router(calendar_router, prefix="", tags=["Calendar"])
+app.include_router(events.router, prefix="/events", tags=["Events"])
+app.include_router(calendar.router, prefix="", tags=["Calendar"])
+app.include_router(jira.router, prefix="/jira", tags=["Jira"])
 
 if __name__ == "__main__":
     import uvicorn
