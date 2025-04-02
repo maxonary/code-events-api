@@ -43,7 +43,7 @@ This project is a FastAPI-based application for organizing and managing events o
    ```
 5. **Run the FastAPI Server**
    ```sh
-   uvicorn main:app --reload
+   uvicorn app.main:app --reload
    ```
 
 ## API Endpoints
