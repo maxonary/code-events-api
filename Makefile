@@ -1,4 +1,4 @@
-.PHONY: help install install-dev test test-cov lint format clean run run-docker build docker-up docker-down generate-requirements
+.PHONY: help install install-dev test test-cov lint format clean run run-docker build docker-up docker-down generate-requirements migrate migrate-upgrade migrate-downgrade
 
 help: ## Show this help message
 	@echo "Available commands:"
@@ -55,4 +55,13 @@ check: ## Run all checks (format, lint, test)
 	test
 
 generate-requirements: ## Generate requirements.txt from pyproject.toml
-	python scripts/generate_requirements.py 
+	python scripts/generate_requirements.py
+
+migrate: ## Create a new migration
+	alembic revision --autogenerate -m "$(message)"
+
+migrate-upgrade: ## Apply migrations
+	alembic upgrade head
+
+migrate-downgrade: ## Rollback migrations
+	alembic downgrade -1 
