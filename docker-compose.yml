@@ -6,24 +6,25 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - MONGO_URI=mongodb://mongo:27017
-      - DB_NAME=campus_events
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/campus_events
       - DEBUG=True
     depends_on:
-      - mongo
+      - postgres
     volumes:
       - .:/app
     restart: unless-stopped
 
-  mongo:
-    image: mongo:7.0
+  postgres:
+    image: postgres:15
     ports:
-      - "27017:27017"
-    volumes:
-      - mongodb_data:/data/db
+      - "5432:5432"
     environment:
-      - MONGO_INITDB_DATABASE=campus_events
+      - POSTGRES_DB=campus_events
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
 
 volumes:
-  mongodb_data: 
+  postgres_data: 
