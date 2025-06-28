@@ -1,5 +1,6 @@
 from typing import Optional
-from pydantic import BaseSettings, validator
+from pydantic_settings import BaseSettings
+from pydantic import field_validator
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -7,8 +8,7 @@ load_dotenv()
 
 class Settings(BaseSettings):
     # Database Configuration
-    mongo_uri: str = "mongodb://localhost:27017"
-    db_name: str = "campus_events"
+    database_url: str = "postgresql://postgres:password@localhost:5432/campus_events"
     
     # API Keys
     google_api_key: Optional[str] = None
@@ -29,13 +29,15 @@ class Settings(BaseSettings):
     # CORS Settings
     cors_origins: list = ["*"]
     
-    @validator('mongo_uri')
-    def validate_mongo_uri(cls, v):
-        if not v.startswith(('mongodb://', 'mongodb+srv://')):
-            raise ValueError('Invalid MongoDB URI')
+    @field_validator('database_url')
+    @classmethod
+    def validate_database_url(cls, v):
+        if not v.startswith(('postgresql://', 'postgresql+asyncpg://')):
+            raise ValueError('Invalid PostgreSQL URL')
         return v
     
-    @validator('log_level')
+    @field_validator('log_level')
+    @classmethod
     def validate_log_level(cls, v):
         valid_levels = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
         if v.upper() not in valid_levels:
@@ -50,8 +52,7 @@ class Settings(BaseSettings):
 settings = Settings()
 
 # Backward compatibility
-MONGO_URI = settings.mongo_uri
-DB_NAME = settings.db_name
+DATABASE_URL = settings.database_url
 GOOGLE_API_KEY = settings.google_api_key
 SLACK_WEBHOOK_URL = settings.slack_webhook_url
 OPENAI_API_KEY = settings.openai_api_key
