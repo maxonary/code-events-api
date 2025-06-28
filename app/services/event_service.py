@@ -1,46 +1,47 @@
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, and_
+from sqlalchemy.orm import selectinload
+from app.models import Event, EventCreate, EventResponse
+from typing import Optional, List
 from datetime import datetime
-from app.database import event_collection
-from app.models import Event
 
-# Create an event in the database
-async def create_event_service(event: Event):
-    event_dict = event.dict()
-    event_dict["created_at"] = datetime.utcnow()
-
-    # Insert event into MongoDB
-    result = await event_collection.insert_one(event_dict)
+async def create_event_service(event_data: EventCreate, db: AsyncSession) -> dict:
+    """Create a new event"""
+    db_event = Event(**event_data.model_dump())
+    db.add(db_event)
+    await db.commit()
+    await db.refresh(db_event)
     
     return {
-        "id": str(result.inserted_id),
-        "message": "Event created successfully",
-        "event": event_dict
+        "id": db_event.id,
+        "message": "Event created successfully"
     }
 
-# Get events with optional filtering
-async def get_events_service(start_time, end_time, visibility):
-    query = {}
-
-    # Filtering by time range
-    if start_time and end_time:
-        query["date"] = {"$gte": start_time, "$lte": end_time}
+async def get_events_service(
+    db: AsyncSession,
+    start_time: Optional[datetime] = None,
+    end_time: Optional[datetime] = None,
+    visibility: Optional[str] = None
+) -> List[EventResponse]:
+    """Get events with optional filtering"""
+    query = select(Event)
     
-    # Filtering by visibility
+    # Apply filters
+    conditions = []
+    if start_time:
+        conditions.append(Event.date >= start_time)
+    if end_time:
+        conditions.append(Event.date <= end_time)
     if visibility:
-        query["visibility"] = visibility
-
-    # Fetch events from MongoDB
-    events = await event_collection.find(query).to_list(length=100)
-
-    return [
-        {
-            "id": str(event["_id"]),
-            "name": event["name"],
-            "date": event["date"],
-            "description": event.get("description", ""),
-            "visibility": event["visibility"],
-            "location": event.get("location", ""),
-            "link": event.get("link", ""),
-            "created_at": event.get("created_at")
-        }
-        for event in events
-    ]
+        conditions.append(Event.visibility == visibility)
+    
+    if conditions:
+        query = query.where(and_(*conditions))
+    
+    # Order by date
+    query = query.order_by(Event.date)
+    
+    result = await db.execute(query)
+    events = result.scalars().all()
+    
+    return [EventResponse.model_validate(event) for event in events]
